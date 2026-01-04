@@ -15,8 +15,8 @@ await sql`CREATE TABLE IF NOT EXISTS players( id           INTEGER     GENERATED
                                               time_created TIMESTAMP   NOT NULL
                                             );`
 
-await sql`CREATE TABLE IF NOT EXISTS game_info( id          BIGINT      GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-                                                game_states BIT(3)[4][] NOT NULL
+await sql`CREATE TABLE IF NOT EXISTS game_info( id         BIGINT      GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                                                game_steps BIT(3)[4][] NOT NULL
                                                );`
 
 await sql`CREATE TABLE IF NOT EXISTS previous_games( game_info_id       BIGINT      REFERENCES game_info(id), 
