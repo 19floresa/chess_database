@@ -70,7 +70,7 @@ export class GameModel
         const game_steps: [ string, string, string, string ][] = []
         for (const step of steps)
         {
-            const gameStep = this.transformStep(step)
+            const gameStep = this.binaryEncoder(step)
             game_steps.push(gameStep)
         }
         
@@ -110,7 +110,7 @@ export class GameModel
     }
 
     numberToBinary = (num: number) =>  num.toString(2).padStart(3, "0")
-    transformStep(step: [ number, number, number, number ]): [ string, string, string, string ]
+    binaryEncoder(step: [ number, number, number, number ]): [ string, string, string, string ]
     {
         const [ x, y, x2, y2 ] = step
         return  [ 
@@ -118,6 +118,18 @@ export class GameModel
             this.numberToBinary(y),
             this.numberToBinary(x2),
             this.numberToBinary(y2),
+        ]
+    }
+
+    binaryToNumber = (b: string) => parseInt(b, 2)
+    binaryDecoder(step: [ string, string, string, string ]): [ number, number, number, number ]
+    {
+        const [ x, y, x2, y2 ] = step
+        return  [ 
+            this.binaryToNumber(x),
+            this.binaryToNumber(y),
+            this.binaryToNumber(x2),
+            this.binaryToNumber(y2),
         ]
     }
 }
