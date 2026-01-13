@@ -35,3 +35,6 @@ export class UserModel
         return out[0]!.id
     }
 }
+
+export const userModel = new UserModel()
+
