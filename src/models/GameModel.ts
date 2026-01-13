@@ -107,8 +107,6 @@ export class GameModel
             }
             return output
         })
-
-        console.log(results)
     }
 
     numberToBinary = (num: number) =>  num.toString(2).padStart(3, "0")
@@ -123,3 +121,5 @@ export class GameModel
         ]
     }
 }
+
+export const gameModel = new GameModel()
