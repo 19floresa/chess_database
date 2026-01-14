@@ -48,12 +48,21 @@ export class GameModel
         this.storePrevEntry(prevEntries)
     }
 
-    async retrieveReplayEntry(playerId: number)
+    async retrieveReplayEntry(playerId: number, gameInfoID: number)
     {
-        const out = await sql`SELECT * FROM players WHERE DATE(time_created) BETWEEN '2025-01-01' and '2025-12-31';`
+        const games = await sql` SELECT * FROM previous_games 
+                                 WHERE player_id=${playerId} AND game_info_id>${gameInfoID} 
+                                 ORDER BY game_info_id DESC
+                                 LIMIT 25;`
+        const ids = []
+        for (const game of games)
+        {
+            const { game_info_id } = game
+            ids.push(game_info_id)
+        }
+        const out = await sql` SELECT * FROM game_info 
+                               WHERE id in ${sql(ids)}`
         console.log(out)
-        // const out = await sql`SELECT * FROM previous_games WHERE player_id=${playerId};`
-        // console.log(out)
         // if (out.length !== 0)
         // {
         //     const { username, password, id } = out[0]!
