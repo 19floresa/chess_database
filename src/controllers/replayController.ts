@@ -1,11 +1,12 @@
 import type { Request, Response } from "express"
 import { gameModel } from "../models/GameModel.ts"
 
-export default function retrieveGameReplay(req: Request, res: Response): void
+export default async function retrieveGameReplay(req: Request, res: Response): void
 {
     try
     {
-        const body = req.body
+        const { id } = req.body
+        await gameModel.retrieveReplayEntry(id)
         res.send({ message: "" })
     }
     catch(e)

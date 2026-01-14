@@ -50,12 +50,15 @@ export class GameModel
 
     async retrieveReplayEntry(playerId: number)
     {
-        const out = await sql`SELECT * FROM players WHERE player_id=${playerId};`
-        if (out.length !== 0)
-        {
-            const { username, password, id } = out[0]!
-            return { username, password, id }
-        }
+        const out = await sql`SELECT * FROM players WHERE DATE(time_created) BETWEEN '2025-01-01' and '2025-12-31';`
+        console.log(out)
+        // const out = await sql`SELECT * FROM previous_games WHERE player_id=${playerId};`
+        // console.log(out)
+        // if (out.length !== 0)
+        // {
+        //     const { username, password, id } = out[0]!
+        //     return { username, password, id }
+        // }
         return null
     }
 
