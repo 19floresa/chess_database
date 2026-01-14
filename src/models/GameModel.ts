@@ -48,6 +48,17 @@ export class GameModel
         this.storePrevEntry(prevEntries)
     }
 
+    async retrieveReplayEntry(playerId: number)
+    {
+        const out = await sql`SELECT * FROM players WHERE player_id=${playerId};`
+        if (out.length !== 0)
+        {
+            const { username, password, id } = out[0]!
+            return { username, password, id }
+        }
+        return null
+    }
+
     createPreviousGameEntry(game_info_id: number,
                             player_id: number): previousGameEntry
     {
