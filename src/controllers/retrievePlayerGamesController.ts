@@ -1,7 +1,7 @@
 import type { Request, Response } from "express"
 import { gameModel } from "../models/GameModel.ts"
 
-export default function retrieveGameReplay(req: Request, res: Response): void
+export default function retrievePlayerGames(req: Request, res: Response): void
 {
     try
     {
@@ -12,5 +12,4 @@ export default function retrieveGameReplay(req: Request, res: Response): void
     {
         res.status(400).json({ message: (e as Error).message })
     }
-   
 }
