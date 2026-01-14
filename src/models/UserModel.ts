@@ -9,7 +9,7 @@ export interface playerEntry {
 export class UserModel
 {
     readonly #setColumns = [ "username", "password", "time_created" ] as const
-    readonly #retrieveColumns = [ "username", "password" ] as const
+    readonly #retrieveColumns = [ "id", "username", "password" ] as const
 
     async createStoreEntry(username: string, password: string, timeCreated: string): Promise<number>
     {
@@ -36,14 +36,14 @@ export class UserModel
         return out[0]!.id
     }
 
-    async retrieveEntry(username: string): Promise<{ username: string, password: string } | null >
+    async retrieveEntry(username: string): Promise<{ username: string, password: string, id: number } | null >
     {
         const columns = this.#retrieveColumns
         const out = await sql`SELECT ${sql(columns)} FROM players WHERE username=${username};`
-        if (out !== undefined)
+        if (out.length !== 0)
         {
-            const { username, password } = out[0]!
-            return { username, password }
+            const { username, password, id } = out[0]!
+            return { username, password, id }
         }
         return null
     }
