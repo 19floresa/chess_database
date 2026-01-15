@@ -50,25 +50,26 @@ export class GameModel
 
     async retrieveReplayEntry(playerId: number, gameInfoID: number)
     {
-        const games = await sql` SELECT * FROM previous_games 
-                                 WHERE player_id=${playerId} AND game_info_id>${gameInfoID} 
-                                 ORDER BY game_info_id DESC
-                                 LIMIT 25;`
-        const ids = []
-        for (const game of games)
+
+        const results = await sql.begin( async (sql): Promise<gameInfoEntry[]> =>
         {
-            const { game_info_id } = game
-            ids.push(game_info_id)
-        }
-        const out = await sql` SELECT * FROM game_info 
-                               WHERE id in ${sql(ids)}`
-        console.log(out)
-        // if (out.length !== 0)
-        // {
-        //     const { username, password, id } = out[0]!
-        //     return { username, password, id }
-        // }
-        return null
+            const games = await sql` SELECT game_info_id FROM previous_games 
+                                     WHERE player_id=${playerId} AND game_info_id>${gameInfoID} 
+                                     ORDER BY game_info_id DESC
+                                     LIMIT 25;`
+            const ids: number[] = []
+            for (const game of games)
+            {
+                ids.push(game.game_info_id)
+            }
+            const rows = await sql<gameInfoEntry[]>` SELECT * FROM game_info 
+                                    WHERE id IN ${sql(ids)}`
+            return rows
+        })
+
+        console.log(results)
+
+        return results.length !== 0 ? results : null
     }
 
     createPreviousGameEntry(game_info_id: number,
