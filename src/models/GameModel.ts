@@ -15,6 +15,16 @@ export interface gameInfoEntry {
     game_steps: [ string, string, string, string ][]
 }
 
+export interface gameInfoOut {
+    idLight: number
+    idDark: number
+    idWinner: number
+    start: string
+    end: string
+    status: string
+    steps: [ number, number, number, number ][]
+}
+
 export class GameModel
 {
     readonly #infoColumns = [ "player_id_light", "player_id_dark", "player_id_winner", "start_time",
@@ -67,9 +77,36 @@ export class GameModel
             return rows
         })
 
-        console.log(results)
+        const gameOut: gameInfoOut[] = []
+        for (const result of results)
+        {
+            const { player_id_light,
+                    player_id_dark,
+                    player_id_winner,
+                    start_time,
+                    end_time,
+                    game_status,
+                    game_steps } = result
 
-        return results.length !== 0 ? results : null
+            const steps = []
+            for (const step of game_steps)
+            {
+                steps.push(this.binaryDecoder(step))
+            }
+
+            gameOut.push(
+            { 
+                idLight: player_id_light,
+                idDark: player_id_dark,
+                idWinner: player_id_winner,
+                start: start_time,
+                end: end_time,
+                status: game_status,
+                steps
+            })
+        }
+
+        return gameOut.length !== 0 ? gameOut : null
     }
 
     createPreviousGameEntry(game_info_id: number,
@@ -114,23 +151,16 @@ export class GameModel
     async storeInfoEntry(entry: gameInfoEntry): Promise<number>
     {
         const columns = this.#infoColumns
-        const out = await sql`INSERT INTO game_info${sql(entry, columns)} returning id`
+        const out = await sql<{ id: number }[]>`INSERT INTO game_info${sql(entry, columns)} returning id`
         return out[0]!.id
     }
 
     async storePrevEntry(entries: previousGameEntry[]): Promise<void>
     {
         const columns = this.#prevColumns
-        const results = await sql.begin( async sql =>
-        {
-            let output = []
-            for (const entry of entries)
-            {
-                const out = await sql`INSERT INTO previous_games${sql(entry, columns)} returning game_info_id`
-                output.push(out)
-            }
-            return output
-        })
+        const results = await sql<{ game_info_id: number }[]>`INSERT INTO previous_games${sql(entries, columns)} returning game_info_id;`
+        //console.log(results)
+
     }
 
     numberToBinary = (num: number) =>  num.toString(2).padStart(3, "0")

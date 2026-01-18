@@ -5,9 +5,9 @@ export default async function retrieveGameReplay(req: Request, res: Response): P
 {
     try
     {
-        const { id } = req.body
-        await gameModel.retrieveReplayEntry(id, 0)
-        res.send({ message: "" })
+        const { playerId, gameId } = req.body
+        const games = await gameModel.retrieveReplayEntry(playerId, gameId)
+        res.send({ message: "Games successfully retrieved.", games })
     }
     catch(e)
     {
