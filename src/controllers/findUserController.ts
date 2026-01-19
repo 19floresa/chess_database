@@ -5,9 +5,9 @@ export default async function findUser(req: Request, res: Response): Promise<voi
 {
     try
     {
-        const { username } = req.body
-        const playerId: number = await userModel.findPlayer(username)
-        res.send({ message: "Player was found.", playerId })
+        const { playerId } = req.body
+        await userModel.findPlayer(playerId)
+        res.send({ message: "Player was found." })
     }
     catch(e)
     {

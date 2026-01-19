@@ -49,15 +49,14 @@ export class UserModel
         return null
     }
 
-    async findPlayer(username: string): Promise<number>
+    async findPlayer(id: number): Promise<void>
     {
         const columns = this.#findColumns
-        const out = await sql< { id: number }[] >`SELECT ${sql(columns)} FROM players WHERE username=${username};`
+        const out = await sql< { id: number }[] >`SELECT ${sql(columns)} FROM players WHERE id=${id};`
         if (out.length === 0)
         {
             throw new Error("Player was not found.")
         }
-        return out[0]!.id
     }
 }
 
