@@ -10,6 +10,7 @@ export class UserModel
 {
     readonly #setColumns = [ "username", "password", "time_created" ] as const
     readonly #retrieveColumns = [ "id", "username", "password" ] as const
+    readonly #findColumns = [ "id" ] as const
 
     async createStoreEntry(username: string, password: string, timeCreated: string): Promise<number>
     {
@@ -46,6 +47,17 @@ export class UserModel
             return { username, password, id }
         }
         return null
+    }
+
+    async findPlayer(username: string): Promise<number>
+    {
+        const columns = this.#findColumns
+        const out = await sql< { id: number }[] >`SELECT ${sql(columns)} FROM players WHERE username=${username};`
+        if (out.length === 0)
+        {
+            throw new Error("Player was not found.")
+        }
+        return out[0]!.id
     }
 }
 
