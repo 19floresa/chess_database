@@ -106,7 +106,7 @@ export class GameModel
             })
         }
 
-        return gameOut.length !== 0 ? gameOut : null
+        return gameOut
     }
 
     createPreviousGameEntry(game_info_id: number,
