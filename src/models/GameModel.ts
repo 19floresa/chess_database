@@ -1,5 +1,8 @@
 import sql from "../database/db.ts"
 
+type stepEncoded = [ string, string, string, string, string ]
+type stepDecoded = [ number, number, number, number, number ]
+
 export interface previousGameEntry {
     game_info_id: number
     player_id: number
@@ -12,7 +15,7 @@ export interface gameInfoEntry {
     start_time: string
     end_time: string
     game_status: string
-    game_steps: [ string, string, string, string ][]
+    game_steps: [ string, string, string, string ][] // TODO: fix
 }
 
 export interface gameInfoOut {
@@ -22,7 +25,7 @@ export interface gameInfoOut {
     start: string
     end: string
     status: string
-    steps: [ number, number, number, number ][]
+    steps: stepDecoded[]
 }
 
 export class GameModel
@@ -91,7 +94,8 @@ export class GameModel
             const steps = []
             for (const step of game_steps)
             {
-                steps.push(this.binaryDecoder(step))
+                const temp: stepEncoded = [ ...step, "0" ] // TODO: fix
+                steps.push(this.binaryDecoder(temp))
             }
 
             gameOut.push(
@@ -176,14 +180,15 @@ export class GameModel
     }
 
     binaryToNumber = (b: string) => parseInt(b, 2)
-    binaryDecoder(step: [ string, string, string, string ]): [ number, number, number, number ]
+    binaryDecoder(step: stepEncoded): stepDecoded
     {
-        const [ x, y, x2, y2 ] = step
+        const [ x, y, x2, y2, special ] = step
         return  [ 
             this.binaryToNumber(x),
             this.binaryToNumber(y),
             this.binaryToNumber(x2),
             this.binaryToNumber(y2),
+            this.binaryToNumber(special),
         ]
     }
 }
