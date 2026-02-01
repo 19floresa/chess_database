@@ -19,16 +19,6 @@ export interface gameInfoEntry {
 }
 
 export interface gameInfoOut {
-    idLight: number
-    idDark: number
-    idWinner: number
-    start: string
-    end: string
-    status: string
-    steps: stepDecoded[]
-}
-
-export interface out {
     opponentName: string
     isLight: boolean
     isWinner: boolean
@@ -72,7 +62,7 @@ export class GameModel
     async retrieveReplayEntry(playerId: number, gameInfoID: number)
     {
 
-        const results = await sql.begin( async (sql): Promise<gameInfoEntry[]> =>
+        const data = await sql.begin( async (sql): Promise<[ gameInfoEntry[], any ]> =>
         {
             const games = await sql` SELECT game_info_id FROM previous_games 
                                      WHERE player_id=${playerId} AND game_info_id>${gameInfoID} 
@@ -83,10 +73,22 @@ export class GameModel
             {
                 ids.push(game.game_info_id)
             }
-            const rows = await sql<gameInfoEntry[]>` SELECT * FROM game_info 
-                                    WHERE id IN ${sql(ids)}`
-            return rows
+            const rowsGameInfo = await sql<gameInfoEntry[]>` SELECT * 
+                                                             FROM game_info 
+                                                             WHERE id IN ${sql(ids)}`
+
+            const rowsUsername = await sql<{ id: number, username: string}[]>` Select id, username 
+                                            FROM players
+                                            WHERE id IN ${sql(ids)}`
+            const users: Record<number, string> = {}
+            for (const { id, username} of rowsUsername)
+            {
+                users[id] = username
+            }
+            return [ rowsGameInfo, users ]
         })
+
+        const [ results, users ] = data
 
         const gameOut: gameInfoOut[] = []
         for (const result of results)
@@ -94,11 +96,14 @@ export class GameModel
             const { player_id_light,
                     player_id_dark,
                     player_id_winner,
-                    start_time,
-                    end_time,
                     game_status,
                     game_steps } = result
 
+            const isLight  = playerId === player_id_light
+            const isWinner = playerId === player_id_winner
+            const status = game_status
+            const opponentId = isLight ? player_id_dark : player_id_light
+            const opponentName = users[opponentId]
             const steps = []
             for (const step of game_steps)
             {
@@ -107,12 +112,10 @@ export class GameModel
 
             gameOut.push(
             { 
-                idLight: player_id_light,
-                idDark: player_id_dark,
-                idWinner: player_id_winner,
-                start: start_time,
-                end: end_time,
-                status: game_status,
+                opponentName,
+                isLight,
+                isWinner,
+                status,
                 steps
             })
         }
