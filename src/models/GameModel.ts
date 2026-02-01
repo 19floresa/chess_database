@@ -18,7 +18,19 @@ export interface gameInfoEntry {
     game_steps: stepEncoded[]
 }
 
+export interface sqlOut {
+    id: number
+    player_id_light: number
+    player_id_dark: number
+    player_id_winner: number
+    start_time: string
+    end_time: string
+    game_status: string
+    game_steps: stepEncoded[]
+}
+
 export interface gameInfoOut {
+    gameId: number
     opponentName: string
     isLight: boolean
     isWinner: boolean
@@ -62,7 +74,7 @@ export class GameModel
     async retrieveReplayEntry(playerId: number, gameInfoID: number)
     {
 
-        const data = await sql.begin( async (sql): Promise<[ gameInfoEntry[], any ]> =>
+        const data = await sql.begin( async (sql): Promise<[ sqlOut[], any ]> =>
         {
             const games = await sql` SELECT game_info_id FROM previous_games 
                                      WHERE player_id=${playerId} AND game_info_id>${gameInfoID} 
@@ -73,7 +85,7 @@ export class GameModel
             {
                 ids.push(game.game_info_id)
             }
-            const rowsGameInfo = await sql<gameInfoEntry[]>` SELECT * 
+            const rowsGameInfo = await sql<sqlOut[]>` SELECT * 
                                                              FROM game_info 
                                                              WHERE id IN ${sql(ids)}`
 
@@ -93,7 +105,8 @@ export class GameModel
         const gameOut: gameInfoOut[] = []
         for (const result of results)
         {
-            const { player_id_light,
+            const { id,
+                    player_id_light,
                     player_id_dark,
                     player_id_winner,
                     game_status,
@@ -112,6 +125,7 @@ export class GameModel
 
             gameOut.push(
             { 
+                gameId: id,
                 opponentName,
                 isLight,
                 isWinner,
