@@ -22,7 +22,7 @@ await sql`CREATE TABLE IF NOT EXISTS game_info( id                BIGINT       G
                                                 start_time        TIMESTAMP    NOT NULL,
                                                 end_time          TIMESTAMP    NOT NULL,
                                                 game_status       VARCHAR(64)  NOT NULL,
-                                                game_steps        BIT(3)[4][]  NOT NULL
+                                                game_steps        BIT(3)[5][]  NOT NULL
                                                );`
 
 await sql`CREATE TABLE IF NOT EXISTS previous_games( game_info_id        BIGINT   REFERENCES game_info(id), 

@@ -15,7 +15,7 @@ export interface gameInfoEntry {
     start_time: string
     end_time: string
     game_status: string
-    game_steps: [ string, string, string, string ][] // TODO: fix
+    game_steps: stepEncoded[]
 }
 
 export interface gameInfoOut {
@@ -24,6 +24,14 @@ export interface gameInfoOut {
     idWinner: number
     start: string
     end: string
+    status: string
+    steps: stepDecoded[]
+}
+
+export interface out {
+    opponentName: string
+    isLight: boolean
+    isWinner: boolean
     status: string
     steps: stepDecoded[]
 }
@@ -40,7 +48,7 @@ export class GameModel
                            start: string,
                            end: string,
                            status: string,
-                           gameSteps: [ number, number, number, number ][]): Promise<void>
+                           gameSteps: stepDecoded[]): Promise<void>
     {
         // Generate and store game information
         const infoEntries: gameInfoEntry = this.createInfoEntry(idLight, 
@@ -94,8 +102,7 @@ export class GameModel
             const steps = []
             for (const step of game_steps)
             {
-                const temp: stepEncoded = [ ...step, "0" ] // TODO: fix
-                steps.push(this.binaryDecoder(temp))
+                steps.push(this.binaryDecoder(step))
             }
 
             gameOut.push(
@@ -130,9 +137,9 @@ export class GameModel
                     start_time: string,
                     end_time: string,
                     game_status: string,
-                    steps: [ number, number, number, number ][]): gameInfoEntry
+                    steps: stepDecoded[]): gameInfoEntry
     {
-        const game_steps: [ string, string, string, string ][] = []
+        const game_steps: stepEncoded[] = []
         for (const step of steps)
         {
             const gameStep = this.binaryEncoder(step)
@@ -168,27 +175,28 @@ export class GameModel
     }
 
     numberToBinary = (num: number) =>  num.toString(2).padStart(3, "0")
-    binaryEncoder(step: [ number, number, number, number ]): [ string, string, string, string ]
+    binaryEncoder(step: stepDecoded): stepEncoded
     {
-        const [ x, y, x2, y2 ] = step
+        const [ x, y, x2, y2, promote ] = step
         return  [ 
             this.numberToBinary(x),
             this.numberToBinary(y),
             this.numberToBinary(x2),
             this.numberToBinary(y2),
+            this.numberToBinary(promote),
         ]
     }
 
     binaryToNumber = (b: string) => parseInt(b, 2)
     binaryDecoder(step: stepEncoded): stepDecoded
     {
-        const [ x, y, x2, y2, special ] = step
+        const [ x, y, x2, y2, promote ] = step
         return  [ 
             this.binaryToNumber(x),
             this.binaryToNumber(y),
             this.binaryToNumber(x2),
             this.binaryToNumber(y2),
-            this.binaryToNumber(special),
+            this.binaryToNumber(promote),
         ]
     }
 }
