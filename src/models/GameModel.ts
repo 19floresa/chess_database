@@ -1,7 +1,8 @@
 import sql from "../database/db.ts"
 
-type stepEncoded = [ string, string, string, string, string ]
-type stepDecoded = [ number, number, number, number, number ]
+/// [ x, y, x2, y2, promote, capture ]
+type stepEncoded = [ string, string, string, string, string, string ]
+type stepDecoded = [ number, number, number, number, number, number ]
 
 export interface previousGameEntry {
     game_info_id: number
@@ -207,26 +208,28 @@ export class GameModel
     numberToBinary = (num: number) =>  num.toString(2).padStart(3, "0")
     binaryEncoder(step: stepDecoded): stepEncoded
     {
-        const [ x, y, x2, y2, promote ] = step
+        const [ x, y, x2, y2, promote, capture ] = step
         return  [ 
             this.numberToBinary(x),
             this.numberToBinary(y),
             this.numberToBinary(x2),
             this.numberToBinary(y2),
             this.numberToBinary(promote),
+            this.numberToBinary(capture),
         ]
     }
 
     binaryToNumber = (b: string) => parseInt(b, 2)
     binaryDecoder(step: stepEncoded): stepDecoded
     {
-        const [ x, y, x2, y2, promote ] = step
+        const [ x, y, x2, y2, promote, capture ] = step
         return  [ 
             this.binaryToNumber(x),
             this.binaryToNumber(y),
             this.binaryToNumber(x2),
             this.binaryToNumber(y2),
             this.binaryToNumber(promote),
+            this.binaryToNumber(capture),
         ]
     }
 }
