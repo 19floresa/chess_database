@@ -79,7 +79,7 @@ export class GameModel
             const games = await sql` SELECT game_info_id
                                      FROM previous_games 
                                      WHERE player_id=${playerId} AND game_info_id>${gameInfoID} 
-                                     ORDER BY game_info_id DESC
+                                     ORDER BY game_info_id ASC
                                      LIMIT 25;`
             const idGames: number[] = []
             for (const game of games)
