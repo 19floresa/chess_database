@@ -76,48 +76,61 @@ export class GameModel
 
         const data = await sql.begin( async (sql): Promise<[ sqlOut[], any ]> =>
         {
-            const games = await sql` SELECT game_info_id FROM previous_games 
+            const games = await sql` SELECT game_info_id
+                                     FROM previous_games 
                                      WHERE player_id=${playerId} AND game_info_id>${gameInfoID} 
                                      ORDER BY game_info_id DESC
                                      LIMIT 25;`
-            const ids: number[] = []
+            const idGames: number[] = []
             for (const game of games)
             {
-                ids.push(game.game_info_id)
+                idGames.push(game.game_info_id)
             }
             const rowsGameInfo = await sql<sqlOut[]>` SELECT * 
-                                                             FROM game_info 
-                                                             WHERE id IN ${sql(ids)}`
+                                                      FROM game_info 
+                                                      WHERE id IN ${sql(idGames)}`
 
-            const rowsUsername = await sql<{ id: number, username: string}[]>` Select id, username 
+            
+            const idPlayersTemp: Record<number, number> = {}
+            for (const row of rowsGameInfo)
+            {
+                const isLight = playerId === row.player_id_light
+                const id = isLight ? row.player_id_dark : row.player_id_light
+                idPlayersTemp[id] = id
+            }
+
+            const idPlayers = Object.keys(idPlayersTemp)
+            const rowsUsername = await sql<{ id: number, username: string}[]>` 
+                                            Select id, username 
                                             FROM players
-                                            WHERE id IN ${sql(ids)}`
+                                            WHERE id IN ${sql(idPlayers)}`
             const users: Record<number, string> = {}
-            for (const { id, username} of rowsUsername)
+            for (const { id, username } of rowsUsername)
             {
                 users[id] = username
             }
+
             return [ rowsGameInfo, users ]
         })
 
         const [ results, users ] = data
-
         const gameOut: gameInfoOut[] = []
         for (const result of results)
         {
-            const { id,
-                    player_id_light,
-                    player_id_dark,
-                    player_id_winner,
-                    game_status,
+            const { id, 
+                    player_id_light, 
+                    player_id_dark, 
+                    player_id_winner, 
+                    game_status, 
                     game_steps } = result
 
-            const isLight  = playerId === player_id_light
-            const isWinner = playerId === player_id_winner
-            const status = game_status
-            const opponentId = isLight ? player_id_dark : player_id_light
-            const opponentName = users[opponentId]
-            const steps = []
+            const gameId:       number        = id
+            const isLight:      boolean       = playerId === player_id_light
+            const isWinner:     boolean       = playerId === player_id_winner
+            const status:       string        = game_status
+            const opponentId:   number        = isLight ? player_id_dark : player_id_light
+            const opponentName: string        = users[opponentId]
+            const steps:        stepDecoded[] = []
             for (const step of game_steps)
             {
                 steps.push(this.binaryDecoder(step))
@@ -125,7 +138,7 @@ export class GameModel
 
             gameOut.push(
             { 
-                gameId: id,
+                gameId,
                 opponentName,
                 isLight,
                 isWinner,
