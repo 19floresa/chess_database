@@ -1,0 +1,22 @@
+services:
+  app:
+    image: node:24-alpine
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - 127.0.0.1:3078:3078
+    working_dir: /app
+    volumes:
+      - ./:/app
+    environment:
+      POSTGRES_HOST: xxx
+      POSTGRES_USER: xxx
+      POSTGRES_PASSWORD: xx
+      POSTGRES_DB: xxx
+  db:
+    image: postgres:latest
+    ports: 
+      - 5400:5400
+    environment:
+      POSTGRES_PASSWORD: xxx
+      POSTGRES_USER: xxx
+      POSTGRES_DB: xxx
