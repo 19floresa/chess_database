@@ -3,8 +3,8 @@ import config from "../config/config.ts"
 
 
 const sql = postgres({
-    host: "db", // fo docker
-    port: /*config.dbPort*/ 5400,
+    host: "db",
+    port: config.dbPort,
     database: config.dbName,
     username: config.dbUsername,
     password: config.dbPassword,

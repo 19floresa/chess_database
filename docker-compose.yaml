@@ -7,16 +7,11 @@ services:
     working_dir: /app
     volumes:
       - ./:/app
-    environment:
-      POSTGRES_HOST: xxx
-      POSTGRES_USER: xxx
-      POSTGRES_PASSWORD: xx
-      POSTGRES_DB: xxx
   db:
     image: postgres:latest
     ports: 
-      - 5400:5400
+      - 127.0.0.1:XXX:XXX
     environment:
-      POSTGRES_PASSWORD: xxx
-      POSTGRES_USER: xxx
-      POSTGRES_DB: xxx
+      POSTGRES_PASSWORD: XXX
+      POSTGRES_USER: XXX
+      POSTGRES_DB: XXX
