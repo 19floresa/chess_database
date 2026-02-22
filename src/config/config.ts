@@ -12,7 +12,7 @@ interface Config {
 }
 
 const config: Config = {
-    port: Number(process.env.PORT) || 3079,
+    port: Number(process.env.PORT) || 3078,
     nodeEnv: process.env.NODE_ENV || "development",
     dbUsername: process.env.DATABASE_USERNAME || "",
     dbPassword: process.env.DATABASE_PASSWORD || "",
