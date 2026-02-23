@@ -1,17 +1,32 @@
 services:
+  db:
+    image: postgres:latest
+    ports: 
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: XXX
+      POSTGRES_USER: XXX
+      POSTGRES_DB: XXX
   app:
     image: node:24-alpine
-    command: sh -c "npm install && npm run dev"
+    command: sh -c "npm install && sleep 10 && npm run dev"
     ports:
       - 127.0.0.1:3078:3078
     working_dir: /app
     volumes:
       - ./:/app
-  db:
-    image: postgres:latest
-    ports: 
-      - 127.0.0.1:XXX:XXX
-    environment:
-      POSTGRES_PASSWORD: XXX
-      POSTGRES_USER: XXX
-      POSTGRES_DB: XXX
+  game:
+    build:
+      context: https://github.com/19floresa/chess_game_server.git
+    ports:
+      - 0.0.0.0:3056:3056
+  gui:
+    build:
+      context: https://github.com/19floresa/chess_microservice.git
+    ports:
+      - 127.0.0.1:3000:3000
+  player:
+    build:
+      context: https://github.com/19floresa/chess_player_server.git
+    ports:
+      - 127.0.0.1:3025:3025
