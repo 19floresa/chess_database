@@ -9,7 +9,7 @@ services:
       POSTGRES_DB: XXX
   app:
     image: node:24-alpine
-    command: sh -c "npm install && sleep 10 && npm run dev"
+    command: sh -c "sleep 10 && npm install && npm run dev"
     ports:
       - 127.0.0.1:3078:3078
     working_dir: /app
