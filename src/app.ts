@@ -8,7 +8,7 @@ import { errorHandler } from "./middleware/errorHandler.ts"
 const app = express()
 
 app.use(cors({
-    origin: ['http://localhost:3025', 'http://localhost:3056'],
+    origin: ['http://localhost:3025', 'http://localhost:3056', "http://16.145.81.136:3056", "http://16.145.81.136:3025" ], 
     methods: ['GET', 'POST',/* 'PUT', 'DELETE', 'PATCH', 'HEAD', 'OPTIONS'*/],
     allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'x-client-key', 'x-client-token', 'x-client-secret', 'Authorization'],
 }))
